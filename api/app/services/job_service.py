@@ -84,9 +84,7 @@ class JobService:
             )
             chunks = split_text(text, self.settings.tts_max_chunk_bytes)
             work_dir = self.settings.tmp_dir / job_id
-            print("##########################")
             paths = await self.tts.synthesize(chunks, work_dir)
-            print(f"#####\n{paths}\n#####")
             _, duration = await self.assembler.assemble(job_id, paths, work_dir)
             await self._update(
                 job_id,

@@ -33,6 +33,11 @@ const config: ExpoConfig = {
   android: {
     package: "app.yomimimi.mobile"
   },
+  extra: {
+    eas: {
+      projectId: "05729d7f-5875-45eb-837f-b545bc2a8c9c"
+    }
+  },
   experiments: { typedRoutes: true }
 };
 
