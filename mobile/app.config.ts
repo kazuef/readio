@@ -31,7 +31,8 @@ const config: ExpoConfig = {
     bundleIdentifier: "app.yomimimi.mobile"
   },
   android: {
-    package: "app.yomimimi.mobile"
+    package: "app.yomimimi.mobile",
+    softwareKeyboardLayoutMode: "resize"
   },
   extra: {
     eas: {
