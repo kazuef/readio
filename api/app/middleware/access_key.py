@@ -13,8 +13,8 @@ class AccessKeyMiddleware(BaseHTTPMiddleware):
         self.expected = settings.mvp_access_key.get_secret_value()
 
     async def dispatch(self, request, call_next):
-        if request.url.path in {"/health", "/docs", "/openapi.json", "/generate"}:
-        # if request.url.path == "/health":
+        if request.url.path == "/health":
+        # if request.url.path in {"/health", "/docs", "/openapi.json", "/generate"}:
             return await call_next(request)
         supplied = request.headers.get("x-mvp-key", "")
         if not self.expected or not secrets.compare_digest(supplied, self.expected):
