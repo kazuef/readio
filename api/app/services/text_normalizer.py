@@ -1,7 +1,6 @@
 import re
 import unicodedata
 
-
 CODE_BLOCK = re.compile(r"```[\s\S]*?```|(?:^|\n)(?: {4}|\t).+(?:(?:\n)(?: {4}|\t).+)*", re.MULTILINE)
 URL_ONLY = re.compile(r"^\s*https?://\S+\s*$", re.IGNORECASE)
 

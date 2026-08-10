@@ -33,7 +33,11 @@ class TtsService:
         try:
             for index, chunk in enumerate(chunks):
                 response = await self._synthesize_with_retry(client, chunk)
-                if not response.audio_content or len(response.audio_content) < 3 or response.audio_content[:2] not in {b"ID", b"\xff\xfb", b"\xff\xf3", b"\xff\xf2"}:
+                if (
+                    not response.audio_content
+                    or len(response.audio_content) < 3
+                    or response.audio_content[:2] not in {b"ID", b"\xff\xfb", b"\xff\xf3", b"\xff\xf2"}
+                ):
                     raise AppError("TTS_TEMPORARY_ERROR", 503)
                 path = output_dir / f"chunk-{index:04}.mp3"
                 path.write_bytes(response.audio_content)
@@ -61,7 +65,11 @@ class TtsService:
         for attempt in range(4):
             try:
                 return await client.synthesize_speech(request=request, timeout=30)
-            except (google_exceptions.TooManyRequests, google_exceptions.ServiceUnavailable, google_exceptions.DeadlineExceeded):
+            except (
+                google_exceptions.TooManyRequests,
+                google_exceptions.ServiceUnavailable,
+                google_exceptions.DeadlineExceeded,
+            ):
                 if attempt == 3:
                     break
                 await asyncio.sleep((2**attempt) + random.random() * 0.25)

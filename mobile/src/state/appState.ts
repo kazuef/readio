@@ -1,7 +1,8 @@
 import type { ProcessingStage } from "@/api/types";
 import type { UserFacingError } from "@/utils/errors";
 
-export type AppPhase = "idle" | "submitting" | "processing" | "ready" | "failed";
+export type AppPhase =
+  "idle" | "submitting" | "processing" | "ready" | "failed";
 
 export type AppState = {
   phase: AppPhase;
@@ -16,6 +17,13 @@ export type AppState = {
 };
 
 export const initialState: AppState = {
-  phase: "idle", inputUrl: "", jobId: null, stage: null, title: null,
-  sourceUrl: null, audioUrl: null, durationSeconds: null, error: null
+  phase: "idle",
+  inputUrl: "",
+  jobId: null,
+  stage: null,
+  title: null,
+  sourceUrl: null,
+  audioUrl: null,
+  durationSeconds: null,
+  error: null,
 };

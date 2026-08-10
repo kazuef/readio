@@ -9,5 +9,5 @@ export const colors = {
   line: "#D8CFEE",
   muted: "#70627F",
   pale: "#EEE8FB",
-  danger: "#A33859"
+  danger: "#A33859",
 };

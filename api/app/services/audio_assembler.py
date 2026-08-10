@@ -1,6 +1,5 @@
 import asyncio
 import json
-import shutil
 from pathlib import Path
 
 from app.errors import AppError
@@ -18,11 +17,23 @@ class AudioAssembler:
         concat_file.write_text("".join(f"file '{path.name}'\n" for path in chunks), encoding="utf-8")
         final = work_dir / "final.mp3"
         process = await asyncio.create_subprocess_exec(
-            "ffmpeg", "-v", "error", "-f", "concat", "-safe", "0", "-i", concat_file.name,
-            "-c", "copy", final.name, cwd=work_dir,
-            stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.PIPE,
+            "ffmpeg",
+            "-v",
+            "error",
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+            concat_file.name,
+            "-c",
+            "copy",
+            final.name,
+            cwd=work_dir,
+            stdout=asyncio.subprocess.DEVNULL,
+            stderr=asyncio.subprocess.PIPE,
         )
-        _, stderr = await process.communicate()
+        _, _stderr = await process.communicate()
         if process.returncode or not final.exists() or final.stat().st_size == 0:
             raise AppError("TTS_TEMPORARY_ERROR", 503)
         duration = await self._duration(final)
@@ -30,8 +41,16 @@ class AudioAssembler:
 
     async def _duration(self, path: Path) -> float:
         process = await asyncio.create_subprocess_exec(
-            "ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "json", str(path),
-            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+            "ffprobe",
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "json",
+            str(path),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
         )
         stdout, _ = await process.communicate()
         try:

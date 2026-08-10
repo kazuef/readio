@@ -1,4 +1,5 @@
-export type ProcessingStage = "queued" | "fetching" | "extracting" | "generating_audio";
+export type ProcessingStage =
+  "queued" | "fetching" | "extracting" | "generating_audio";
 export type JobStatus = ProcessingStage | "ready" | "failed";
 
 export type ApiErrorBody = {

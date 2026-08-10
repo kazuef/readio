@@ -1,6 +1,6 @@
 import asyncio
 import shutil
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from app.config import Settings
 from app.repositories.audio_repository import AudioRepository
@@ -15,7 +15,7 @@ class CleanupService:
         self.active_jobs = active_jobs
 
     async def run_once(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         known_ids: set[str] = set()
         for path in self.metadata.paths():
             item = await self.metadata.get(path.stem)
@@ -28,11 +28,11 @@ class CleanupService:
                 await self.metadata.delete(item.id)
         cutoff = now - timedelta(hours=self.settings.retention_hours)
         for path in self.settings.audio_dir.glob("*.mp3"):
-            modified = datetime.fromtimestamp(path.stat().st_mtime, timezone.utc)
+            modified = datetime.fromtimestamp(path.stat().st_mtime, UTC)
             if path.stem not in known_ids and modified <= cutoff:
                 path.unlink(missing_ok=True)
         for path in self.settings.tmp_dir.iterdir():
-            modified = datetime.fromtimestamp(path.stat().st_mtime, timezone.utc)
+            modified = datetime.fromtimestamp(path.stat().st_mtime, UTC)
             if path.name not in self.active_jobs and modified <= cutoff:
                 shutil.rmtree(path, ignore_errors=True)
 

@@ -1,6 +1,6 @@
 import hashlib
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email.utils import formatdate
 
 from fastapi import APIRouter, Request, Response
@@ -23,7 +23,7 @@ async def get_audio(job_id: str, request: Request):
         raise AppError("AUDIO_NOT_FOUND", 404)
     item = await metadata_repository.get(job_id)
     path = audio_repository.path_for(job_id)
-    if not item or item.status != "ready" or item.expires_at <= datetime.now(timezone.utc) or not path.exists():
+    if not item or item.status != "ready" or item.expires_at <= datetime.now(UTC) or not path.exists():
         raise AppError("AUDIO_NOT_FOUND", 404)
     stat = path.stat()
     etag = hashlib.sha256(f"{stat.st_size}:{stat.st_mtime_ns}".encode()).hexdigest()
@@ -59,5 +59,9 @@ async def get_audio(job_id: str, request: Request):
         content=content,
         status_code=206,
         media_type="audio/mpeg",
-        headers={**headers, "Content-Range": f"bytes {start}-{end}/{stat.st_size}", "Content-Length": str(len(content))},
+        headers={
+            **headers,
+            "Content-Range": f"bytes {start}-{end}/{stat.st_size}",
+            "Content-Length": str(len(content)),
+        },
     )

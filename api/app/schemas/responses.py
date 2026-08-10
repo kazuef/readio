@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -11,7 +10,7 @@ from .metadata import JobStatus
 class ErrorDetail(BaseModel):
     code: str
     message: str
-    request_id: Optional[str] = None
+    request_id: str | None = None
 
 
 class ErrorResponse(BaseModel):
@@ -32,11 +31,11 @@ class JobError(BaseModel):
 class JobResponse(BaseModel):
     id: str
     status: JobStatus
-    title: Optional[str]
-    source_url: Optional[str] = None
-    audio_url: Optional[str] = None
-    duration_seconds: Optional[float] = None
+    title: str | None
+    source_url: str | None = None
+    audio_url: str | None = None
+    duration_seconds: float | None = None
     created_at: datetime
     updated_at: datetime
     expires_at: datetime
-    error: Optional[JobError] = None
+    error: JobError | None = None

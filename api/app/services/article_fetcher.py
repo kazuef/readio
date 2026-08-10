@@ -50,12 +50,17 @@ class _PinnedTransport(httpx.AsyncHTTPTransport):
 async def fetch_article(initial: ValidatedUrl, settings: Settings) -> FetchedArticlePage:
     current = initial
     timeout = httpx.Timeout(settings.fetch_timeout_seconds)
-    headers = {"User-Agent": "YOMIMIMI/1.0 (+https://example.invalid/support)", "Accept": "text/html,application/xhtml+xml"}
+    headers = {
+        "User-Agent": "YOMIMIMI/1.0 (+https://example.invalid/support)",
+        "Accept": "text/html,application/xhtml+xml",
+    }
     for redirect_count in range(settings.max_redirects + 1):
         current = await validate_url(current.normalized_url)
         # A fresh transport pins this request to an already validated public IP.
         transport = _PinnedTransport(current.resolved_ips[0])
-        async with httpx.AsyncClient(timeout=timeout, follow_redirects=False, headers=headers, transport=transport) as client:
+        async with httpx.AsyncClient(
+            timeout=timeout, follow_redirects=False, headers=headers, transport=transport
+        ) as client:
             try:
                 async with client.stream("GET", current.normalized_url) as response:
                     if response.status_code in {301, 302, 303, 307, 308}:
@@ -78,7 +83,9 @@ async def fetch_article(initial: ValidatedUrl, settings: Settings) -> FetchedArt
                         if len(body) > settings.max_fetch_bytes:
                             raise AppError("ARTICLE_TOO_LARGE", 413)
                     encoding = response.encoding or "utf-8"
-                    return FetchedArticlePage(current.normalized_url, body.decode(encoding, errors="replace"), content_type)
+                    return FetchedArticlePage(
+                        current.normalized_url, body.decode(encoding, errors="replace"), content_type
+                    )
             except AppError:
                 raise
             except (httpx.HTTPError, ValueError, UnicodeError):

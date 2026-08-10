@@ -1,10 +1,10 @@
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Request
 
 from app.dependencies import metadata_repository
-from app.errors import AppError, MESSAGES
+from app.errors import MESSAGES, AppError
 from app.middleware.rate_limit import RateLimiter
 from app.schemas.responses import JobError, JobResponse
 
@@ -19,9 +19,13 @@ async def get_job(job_id: str, request: Request) -> JobResponse:
     if not ULID_PATTERN.fullmatch(job_id):
         raise AppError("INVALID_JOB_ID", 400)
     item = await metadata_repository.get(job_id)
-    if not item or item.expires_at <= datetime.now(timezone.utc):
+    if not item or item.expires_at <= datetime.now(UTC):
         raise AppError("JOB_NOT_FOUND", 404)
-    error = JobError(code=item.error_code, message=MESSAGES.get(item.error_code, MESSAGES["INTERNAL_ERROR"])) if item.error_code else None
+    error = (
+        JobError(code=item.error_code, message=MESSAGES.get(item.error_code, MESSAGES["INTERNAL_ERROR"]))
+        if item.error_code
+        else None
+    )
     ready = item.status == "ready"
     return JobResponse(
         id=item.id,

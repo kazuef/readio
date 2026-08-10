@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import shutil
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from app.config import Settings
 from app.errors import AppError
@@ -37,7 +37,7 @@ class JobService:
         self.active_jobs: set[str] = set()
 
     async def create(self, job_id: str, source_url: str) -> JobMetadata:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         item = JobMetadata(
             id=job_id,
             source_url=source_url,
@@ -53,11 +53,12 @@ class JobService:
         self.active_jobs.add(job_id)
         try:
             await asyncio.wait_for(self._run(job_id), timeout=self.settings.job_timeout_seconds)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             await self._fail(job_id, "JOB_TIMEOUT")
         except AppError as exc:
             await self._fail(job_id, exc.code)
         except Exception:
+            logger.exception("job_unhandled_error", extra={"job_id": job_id, "stage": "failed"})
             await self._fail(job_id, "INTERNAL_ERROR")
         finally:
             self.active_jobs.discard(job_id)
@@ -99,7 +100,7 @@ class JobService:
         item = await self.metadata.get(job_id)
         if not item:
             raise AppError("JOB_NOT_FOUND", 404)
-        item = item.model_copy(update={**changes, "updated_at": datetime.now(timezone.utc)})
+        item = item.model_copy(update={**changes, "updated_at": datetime.now(UTC)})
         await self.metadata.save(item)
         return item
 

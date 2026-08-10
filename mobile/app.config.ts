@@ -13,8 +13,8 @@ const config: ExpoConfig = {
       "expo-build-properties",
       {
         ios: { deploymentTarget: "15.1" },
-        android: { minSdkVersion: 29 }
-      }
+        android: { minSdkVersion: 29 },
+      },
     ],
     [
       "expo-audio",
@@ -22,24 +22,24 @@ const config: ExpoConfig = {
         enableBackgroundPlayback: true,
         enableBackgroundRecording: false,
         recordAudioAndroid: false,
-        microphonePermission: false
-      }
-    ]
+        microphonePermission: false,
+      },
+    ],
   ],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "app.yomimimi.mobile"
+    bundleIdentifier: "app.yomimimi.mobile",
   },
   android: {
     package: "app.yomimimi.mobile",
-    softwareKeyboardLayoutMode: "resize"
+    softwareKeyboardLayoutMode: "resize",
   },
   extra: {
     eas: {
-      projectId: "05729d7f-5875-45eb-837f-b545bc2a8c9c"
-    }
+      projectId: "05729d7f-5875-45eb-837f-b545bc2a8c9c",
+    },
   },
-  experiments: { typedRoutes: true }
+  experiments: { typedRoutes: true },
 };
 
 export default config;

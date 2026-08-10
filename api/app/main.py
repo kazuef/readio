@@ -8,7 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.dependencies import audio_repository, job_service, metadata_repository, settings
-from app.errors import AppError, MESSAGES
+from app.errors import MESSAGES, AppError
 from app.logging_config import configure_logging
 from app.middleware.access_key import AccessKeyMiddleware
 from app.middleware.request_id import RequestIdMiddleware
@@ -64,7 +64,13 @@ async def log_request(request: Request, call_next):
 async def app_error_handler(request: Request, exc: AppError):
     return JSONResponse(
         status_code=exc.status_code,
-        content={"error": {"code": exc.code, "message": exc.message, "request_id": getattr(request.state, "request_id", None)}},
+        content={
+            "error": {
+                "code": exc.code,
+                "message": exc.message,
+                "request_id": getattr(request.state, "request_id", None),
+            }
+        },
     )
 
 
@@ -72,5 +78,11 @@ async def app_error_handler(request: Request, exc: AppError):
 async def validation_error_handler(request: Request, _: RequestValidationError):
     return JSONResponse(
         status_code=400,
-        content={"error": {"code": "INVALID_URL", "message": MESSAGES["INVALID_URL"], "request_id": getattr(request.state, "request_id", None)}},
+        content={
+            "error": {
+                "code": "INVALID_URL",
+                "message": MESSAGES["INVALID_URL"],
+                "request_id": getattr(request.state, "request_id", None),
+            }
+        },
     )

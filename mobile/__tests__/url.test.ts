@@ -6,6 +6,9 @@ describe("validateArticleUrl", () => {
     expect(validateArticleUrl("ftp://example.com").valid).toBe(false);
   });
   it("accepts an HTTPS article URL", () => {
-    expect(validateArticleUrl(" https://example.com/article ")).toEqual({ valid: true, value: "https://example.com/article" });
+    expect(validateArticleUrl(" https://example.com/article ")).toEqual({
+      valid: true,
+      value: "https://example.com/article",
+    });
   });
 });

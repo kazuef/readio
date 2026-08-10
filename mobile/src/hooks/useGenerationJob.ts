@@ -12,7 +12,11 @@ type Callbacks = {
   onFailure: (error: UserFacingError) => void;
 };
 
-export function useGenerationJob(jobId: string | null, active: boolean, callbacks: Callbacks): void {
+export function useGenerationJob(
+  jobId: string | null,
+  active: boolean,
+  callbacks: Callbacks,
+): void {
   const callbacksRef = useRef(callbacks);
   callbacksRef.current = callbacks;
 
@@ -26,7 +30,11 @@ export function useGenerationJob(jobId: string | null, active: boolean, callback
     const poll = async () => {
       if (cancelled) return;
       if (Date.now() - startedAt >= 300_000) {
-        callbacksRef.current.onFailure({ code: "JOB_TIMEOUT", message: "音声生成に時間がかかりすぎました。", canRetry: true });
+        callbacksRef.current.onFailure({
+          code: "JOB_TIMEOUT",
+          message: "音声生成に時間がかかりすぎました。",
+          canRetry: true,
+        });
         return;
       }
       try {
@@ -35,8 +43,18 @@ export function useGenerationJob(jobId: string | null, active: boolean, callback
         failures = 0;
         if (job.status === "failed") {
           const code = job.error?.code ?? "INTERNAL_ERROR";
-          const cannotRetry = ["INVALID_URL", "URL_NOT_ALLOWED", "ACCESS_DENIED", "ARTICLE_EXTRACTION_FAILED", "ARTICLE_TOO_LARGE"].includes(code);
-          callbacksRef.current.onFailure({ code, message: job.error?.message ?? "音声を生成できませんでした。", canRetry: !cannotRetry });
+          const cannotRetry = [
+            "INVALID_URL",
+            "URL_NOT_ALLOWED",
+            "ACCESS_DENIED",
+            "ARTICLE_EXTRACTION_FAILED",
+            "ARTICLE_TOO_LARGE",
+          ].includes(code);
+          callbacksRef.current.onFailure({
+            code,
+            message: job.error?.message ?? "音声を生成できませんでした。",
+            canRetry: !cannotRetry,
+          });
           return;
         }
         callbacksRef.current.onUpdate(job);
@@ -44,7 +62,10 @@ export function useGenerationJob(jobId: string | null, active: boolean, callback
       } catch (error) {
         if (cancelled) return;
         failures += 1;
-        if (failures > 3 || (error instanceof ApiError && [401, 403, 404].includes(error.status))) {
+        if (
+          failures > 3 ||
+          (error instanceof ApiError && [401, 403, 404].includes(error.status))
+        ) {
           callbacksRef.current.onFailure(toUserFacingError(error));
           return;
         }

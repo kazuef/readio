@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 
+from app.dependencies import settings
 from app.main import app
 
 
@@ -19,7 +20,7 @@ def test_protected_routes_require_access_key():
 
 def test_invalid_job_id_uses_public_error_contract():
     with TestClient(app) as client:
-        response = client.get("/jobs/not-a-job", headers={"X-MVP-Key": "dev-only-change-me"})
+        response = client.get("/jobs/not-a-job", headers={"X-MVP-Key": settings.mvp_access_key.get_secret_value()})
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "INVALID_JOB_ID"
     assert response.json()["error"]["request_id"]

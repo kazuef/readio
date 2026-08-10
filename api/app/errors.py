@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-
 MESSAGES = {
     "INVALID_URL": "正しい記事URLを入力してください。",
     "INVALID_JOB_ID": "変換情報の形式が正しくありません。",

@@ -36,7 +36,9 @@ def split_text(value: str, max_bytes: int = 4500) -> list[str]:
     current = ""
     paragraphs = [part.strip() for part in re.split(r"\n\s*\n", value) if part.strip()]
     for paragraph in paragraphs:
-        pieces = [paragraph] if len(paragraph.encode("utf-8")) <= max_bytes else _split_long_paragraph(paragraph, max_bytes)
+        pieces = (
+            [paragraph] if len(paragraph.encode("utf-8")) <= max_bytes else _split_long_paragraph(paragraph, max_bytes)
+        )
         for piece in pieces:
             candidate = f"{current}\n\n{piece}" if current else piece
             if current and len(candidate.encode("utf-8")) > max_bytes:
