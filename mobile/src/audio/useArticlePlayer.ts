@@ -21,10 +21,6 @@ export function useArticlePlayer(
       { title: title ?? "記事", artist: "YOMIMIMI" },
       { showSeekBackward: false, showSeekForward: false },
     );
-    return () => {
-      player.pause();
-      player.setActiveForLockScreen(false);
-    };
   }, [audioPath, player, title]);
 
   useEffect(() => {
